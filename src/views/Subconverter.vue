@@ -27,9 +27,13 @@
 
               <div v-if="advanced === '2'">
                 <el-form-item label="后端地址:">
-                  <el-autocomplete style="width: 100%" v-model="form.customBackend" :fetch-suggestions="backendSearch"
-                    placeholder="动动小手，（建议）自行搭建后端服务。例：http://127.0.0.1:25500/sub?">
+                  <el-autocomplete style="width: 100%" v-model="form.customBackendDisplay"
+                    :fetch-suggestions="backendSearch" placeholder="动动小手，（建议）自行搭建后端服务。例：http://127.0.0.1:25500/sub?"
+                    value-key="label" @select="handleSelect">
                     <el-button slot="append" @click="gotoGayhub" icon="el-icon-link">前往项目仓库</el-button>
+                    <template slot-scope="{ item }">
+                      <div>{{ item.label }}</div>
+                    </template>
                   </el-autocomplete>
                 </el-form-item>
                 <el-form-item label="远程配置:">
@@ -164,7 +168,7 @@
       <div slot="title">
         解析 Subconverter 链接
       </div>
-      <el-form label-position="left" :inline="true" >
+      <el-form label-position="left" :inline="true">
         <el-form-item prop="uploadConfig" label="订阅链接：" label-width="85px">
           <el-input v-model="loadConfig" style="width: 565px"></el-input>
         </el-form-item>
@@ -210,12 +214,17 @@ export default {
           ssd: "ssd",
           sssub: "sssub",
           ssr: "ssr",
-          ClashR: "clashr",          
+          ClashR: "clashr",
           V2Ray: "v2ray",
           Trojan: "trojan",
           Surge3: "surge&ver=3",
         },
-        backendOptions: [{ value: "http://127.0.0.1:25500/sub?" }],
+        backendOptions: [
+          { 
+            label: "本地", 
+            value: "http://127.0.0.1:25500/sub?" 
+          }
+        ],
         remoteConfig: [
           {
             label: "universal",
@@ -655,6 +664,12 @@ export default {
 
       // 调用 callback 返回建议列表的数据
       cb(results);
+    },
+    handleSelect(item) {
+      // 保存选中的 value 到 customBackend
+      this.form.customBackend = item.value;
+      // 保存选中的 label 到 customBackendDisplay
+      this.form.customBackendDisplay = item.label;
     },
     createFilter(queryString) {
       return candidate => {
